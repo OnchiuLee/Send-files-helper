@@ -33,7 +33,11 @@ RunHotkey:=AHKIni["Hotkeys","RunHotkey"]
 WinClip := new WinClip
 Gosub TRAY_Menu
 Gosub ReadInis
+if FileExist(A_ScriptDir "\*.ico") 
+	Loop,Files,*.ico
+		IcoFileN:=A_LoopFileLongPath, break
 
+Menu, Tray, Icon, %IcoFileN%
 ;*****************¿ì½Ý¼ü²Ù×÷*****************
 if RunHotkey
 	Hotkey, %RunHotkey%, SendFile,on
