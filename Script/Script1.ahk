@@ -22,9 +22,9 @@ TRAY_Menu:
 	Menu, Tray, Add,
 	Menu, Tray, Add, 设置页面, GuiFileShow
 	Menu, Tray, Add,
-	Menu, Tray, Add,执行, SendFile
-	Menu, Tray, Add,
-	Menu, Tray, Add,重启, OnReload
+	;Menu, Tray, Add,执行, SendFile
+	;Menu, Tray, Add,
+	Menu, Tray, Add,重载, OnReload
 	Menu, Tray, Add,
 	Menu, Tray, Add,退出, OnExit
 	Menu, Tray, Default,设置页面
@@ -54,7 +54,7 @@ GuiFileShow:
 	Gui, 99:Add, Hotkey,x+5 yp-4 vSendHotkey gSendHotkey,% RunHotkey
 	Gui, 99:Font
 	Gui, 99:Font, s10 bold
-	Gui, 99:Add, text,xm vTextInfo1,文件列表记录`n〔 多选批量/单选/双击添加至发送列表，文件拖拽至此窗口批量添加〕
+	Gui, 99:Add, text,xm vTextInfo1,〔 多选批量/单选/双击添加至发送列表，文件拖拽至此窗口批量添加〕`n文件列表记录
 	Gui, 99:Font
 	Gui, 99:Add, ListView,xm w420 r15 Grid AltSubmit ReadOnly NoSortHdr NoSort -WantF2 -Multi 0x8 LV0x40 -LV0x10 gMyFileList vMyFileList hwndFileLV, 编号|文件路径|存在
 	Loop, Parse, FilePathAll, `n, `r
@@ -81,6 +81,30 @@ GuiFileShow:
 	Gui, 99:show,AutoSize,「文件列表」
 	CheckedStatus:=0
 return
+
+99GuiContextMenu(GuiHwnd, CtrlHwnd, EventInfo, IsRightClick, X, Y){
+	global AHKIni
+	If (GuiHwnd&&IsRightClick&&EventInfo){
+		LV_GetText(posInfo, A_EventInfo,2)
+		Menu, RKeyMenu, Add, 添加至列表,AddPath
+		Menu, RKeyMenu, Add, 删除,DelItems
+		Menu, RKeyMenu, show
+		GuiControl, Focus, ahk_id %GuiHwnd%
+	}
+	DelItems:
+		if (posInfo&&A_ThisMenuItem~="删除"&&A_EventInfo) {
+			AHKIni.RemoveKey("FilePath", A_EventInfo)
+			LV_Delete(A_EventInfo)
+		}
+	return
+
+	AddPath:
+		If (posInfo&&A_ThisMenuItem~="添加") {
+			AHKIni["FileLists",AHKIni["FileLists"].length()+1]:=posInfo,AHKIni.Save()
+			GuiControl,99:,FilePathList,% RegExReplace(posInfo,".+\\")
+		}
+	return
+}
 
 SendHotkey:
 	if SendHotkey
