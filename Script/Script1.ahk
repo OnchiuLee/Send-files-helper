@@ -44,7 +44,7 @@ return
 GuiFileShow:
 	Gui, 99:Destroy
 	Gui, 99:Default
-	Gui, 99: +AlwaysOnTop
+	;Gui, 99: +AlwaysOnTop
 	Gui, 99:Add, button, vSelectMore gSelectMore,多选
 	Gui, 99:Add, button,x+5 vDelFilePath gDelFilePath,删除
 	GuiControl, 99:Disable, DelFilePath
@@ -56,7 +56,7 @@ GuiFileShow:
 	Gui, 99:Font, s10 bold
 	Gui, 99:Add, text,xm vTextInfo1,〔 多选批量/单选/双击添加至发送列表，文件拖拽至此窗口批量添加〕`n文件列表记录
 	Gui, 99:Font
-	Gui, 99:Add, ListView,xm w420 r15 Grid AltSubmit ReadOnly NoSortHdr NoSort -WantF2 -Multi 0x8 LV0x40 -LV0x10 gMyFileList vMyFileList hwndFileLV, 编号|文件路径|存在
+	Gui, 99:Add, ListView,xm w420 r20 Grid AltSubmit ReadOnly NoSortHdr NoSort -WantF2 -Multi 0x8 LV0x40 -LV0x10 gMyFileList vMyFileList hwndFileLV, 编号|文件路径|存在
 	Loop, Parse, FilePathAll, `n, `r
 		If A_LoopField
 			LV_Add("",A_Index, A_LoopField,(FileExist(A_LoopField)?"√":"×")), LV_ModifyCol()
@@ -119,10 +119,11 @@ ReloadFilePath:
 	Loop, Parse, FilePathAll, `n, `r
 		If A_LoopField
 			LV_Add("",A_Index, A_LoopField,(FileExist(A_LoopField)?"√":"×"))
+	GuiControl,99:,FilePathList, |
 	Loop,Parse,FileLisst2,|
 		FileLisst.= "|" RegExReplace(A_LoopField,".+\\")
 	If FileLisst
-		GuiControl,99:,FilePathList, % FileLisst
+		GuiControl,99:,FilePathList, %FileLisst%
 return
 
 SelectMore:
@@ -141,12 +142,12 @@ RMFilePath:
 		for k,v in AHKIni["FileLists"]
 			if AHKIni["FileLists",A_Index]~=FilePathList "$"
 				AHKIni.RemoveKey("FileLists", A_Index), AHKIni.Save()
+	GuiControl,99:,FilePathList, |
 	Gosub ReadInis
 	FileLisst:=""
 	Loop,Parse,FileLisst2,|
 		FileLisst.= "|" RegExReplace(A_LoopField,".+\\")
-	If FileLisst
-		GuiControl,99:,FilePathList, % FileLisst
+	GuiControl,99:,FilePathList, %FileLisst%
 return
 
 FilePathList:
