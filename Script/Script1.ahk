@@ -44,19 +44,24 @@ return
 GuiFileShow:
 	Gui, 99:Destroy
 	Gui, 99:Default
-	;Gui, 99: +AlwaysOnTop
+	Gui, 99: -MaximizeBox    ;+AlwaysOnTop
+	Gui, 99:Font
+	Gui, 99:Font,s10 bold
 	Gui, 99:Add, button, vSelectMore gSelectMore,多选
 	Gui, 99:Add, button,x+5 vDelFilePath gDelFilePath,删除
 	GuiControl, 99:Disable, DelFilePath
 	Gui, 99:Add, button,x+5 vReloadFilePath gReloadFilePath,刷新
 	Gui, 99:Add, button,x+5 vGetFilePath gGetFilePath,文件选取
-	Gui, 99:Add, text,xm y+10,发送热键：
+	Gui, 99:Font
+	Gui, 99:Add, text,x+5 yp+4,〔 多选批量/单选/双击添加至发送列表，文件拖拽至此窗口批量添加〕
+	Gui, 99:Add, text,xm y+30,发送热键：
 	Gui, 99:Add, Hotkey,x+5 yp-4 vSendHotkey gSendHotkey,% RunHotkey
 	Gui, 99:Font
-	Gui, 99:Font, s10 bold
-	Gui, 99:Add, text,xm vTextInfo1,〔 多选批量/单选/双击添加至发送列表，文件拖拽至此窗口批量添加〕`n文件列表记录
+	Gui, 99:Font,s12 cRed Bold
+	Gui, 99:Add, text,xm y+10 w420 vTextInfo1,文件列表记录
+	GuiControl, 99:Font, TextInfo1
 	Gui, 99:Font
-	Gui, 99:Add, ListView,xm w420 r20 Grid AltSubmit ReadOnly NoSortHdr NoSort -WantF2 -Multi 0x8 LV0x40 -LV0x10 gMyFileList vMyFileList hwndFileLV, 编号|文件路径|存在
+	Gui, 99:Add, ListView,xm y+10 w420 r20 Grid AltSubmit ReadOnly NoSortHdr NoSort -WantF2 Border -Multi 0x8 LV0x40 -LV0x10 gMyFileList vMyFileList hwndFileLV, 编号|文件路径|存在
 	Loop, Parse, FilePathAll, `n, `r
 		If A_LoopField
 			LV_Add("",A_Index, A_LoopField,(FileExist(A_LoopField)?"√":"×")), LV_ModifyCol()
@@ -65,19 +70,24 @@ GuiFileShow:
 	LV_ModifyCol(3,"50 left")
 	GuiControlGet, ListVar, Pos , MyFileList
 	GuiControlGet, ListVar1, Pos , TextInfo1
+	SysGet, WSCROLL, 2
 	FileLisst:=""
 	Loop,Parse,FileLisst2,|
 		FileLisst.=RegExReplace(A_LoopField,".+\\") "|"
-	x_:=ListVarX+450+15,__:=ListVarH*0.6
+	x_:=ListVarX+450+WSCROLL,__:=ListVarH*0.6
+	Gui, 99:Font
+	Gui, 99:Font,s10 bold
 	Gui, 99:Add, button,x+10 y%__% vAddFilePath gAddFilePath,添加 -->>
 	Gui, 99:Add, button,xp y+30 vRMFilePath gRMFilePath,删除 <<--
 	Gui, 99:Add, button,xp y+30 vClearFilePath gClearFilePath,清除全部<<--
-	y__:=ListVar1Y,_i_:=ListVar1Y+ListVar1H/2
+	y__:=ListVar1Y,_i_:=ListVar1Y
 	Gui, 99:Font
-	Gui, 99:Font, s10 bold
-	Gui, 99:Add, text,x+10 y%_i_% ,文件待发送列表
+	Gui, 99:Font,s12 cRed Bold
+	Gui, 99:Add, text,x+10 y+10 y%_i_% vTextInfo2,文件待发送列表
+	GuiControl, 99:Font, TextInfo2
 	Gui, 99:Font
-	Gui, 99:Add, ListBox, h%ListVarH% w%ListVarH% gFilePathList vFilePathList,% FileLisst
+	lx:=ListVarH+WSCROLL/2, lx2:=ListVarH*0.6
+	Gui, 99:Add, ListBox,y+10 h%lx% w%lx2% gFilePathList vFilePathList HScroll%ListVarH% Border ,% FileLisst
 	Gui, 99:show,AutoSize,「文件列表」
 	CheckedStatus:=0
 return
