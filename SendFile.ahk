@@ -8,7 +8,7 @@ SetWorkingDir %A_ScriptDir%
 WinGetPos,,,,Shell_Wnd ,ahk_class Shell_TrayWnd
 
 global default_obj, AHKIni:=class_EasyIni("setting.ini")
-default_obj:={FilePath:["C:\Windows\System32\drivers\etc\hosts","C:\Windows\WMInfo"],FileLists:["C:\Windows\System32\drivers\etc\hosts"],Hotkeys:{RunHotkey:"!d"}}
+default_obj:={FilePath:["支持文件\目录拖拽至此窗口批量添加"],FileLists:["请从左侧选区添加"],Hotkeys:{RunHotkey:"!d"}}
 Array_isInValue(aArr, aStr)
 {
 	for k,v in aArr
@@ -24,12 +24,15 @@ Array_isInValue(aArr, aStr)
 }
 For Section, element In default_obj
 {
-	if (AHKIni[Section].length()<1)
-		For key, value In element
-			AHKIni[Section, key]:=value
+	For key, value In element
+	{
+		if ((%key%:=AHKIni[Section, key])="")
+			%key%:=AHKIni[Section, key]:=value
+		else
+			%key%:=AHKIni[Section, key]
+	}
 }
 AHKIni.Save()
-RunHotkey:=AHKIni["Hotkeys","RunHotkey"]
 WinClip := new WinClip
 Gosub TRAY_Menu
 Gosub ReadInis
