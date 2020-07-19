@@ -44,7 +44,7 @@ return
 GuiFileShow:
 	Gui, 99:Destroy
 	Gui, 99:Default
-	Gui, 99: -MaximizeBox    ;+AlwaysOnTop
+	Gui, 99: -MaximizeBox hwndSFiles    ;+AlwaysOnTop
 	Gui, 99:Font
 	Gui, 99:Font,s10 bold
 	Gui, 99:Add, button, vSelectMore gSelectMore,多选
@@ -89,6 +89,10 @@ GuiFileShow:
 	lx:=ListVarH+WSCROLL/2, lx2:=ListVarH*0.75
 	Gui, 99:Add, ListBox,y+10 h%lx% w%lx2% gFilePathList vFilePathList HScroll%ListVarH% Border ,% FileLisst
 	Gui, 99:show,AutoSize,「文件列表」
+	DllCall("PrivateExtractIcons", "str", "shell32.dll", "int", 15, "int", 64, "int", 64
+		, "ptr*", hIcon, "uint*", 0, "uint", 1, "uint", 0, "ptr")
+	SendMessage, WM_SETICON:=0x80, ICON_SMALL2:=0, hIcon,, ahk_id %SFiles%
+	SendMessage, WM_SETICON:=0x80, ICON_BIG:=1   , hIcon,, ahk_id %SFiles% 
 	CheckedStatus:=0
 return
 
