@@ -58,7 +58,7 @@ GuiFileShow:
 	Gui, 99:Add, Hotkey,x+5 yp-4 vSendHotkey gSendHotkey,% RunHotkey
 	Gui, 99:Font
 	Gui, 99:Font,s12 cRed Bold
-	Gui, 99:Add, text,xm y+10 w420 vTextInfo1,文件列表记录
+	Gui, 99:Add, text,xm y+10 w420 vTextInfo1,文件列表记录（双击添加）
 	GuiControl, 99:Font, TextInfo1
 	Gui, 99:Font
 	Gui, 99:Add, ListView,xm y+10 w420 r20 Grid AltSubmit ReadOnly NoSortHdr NoSort -WantF2 Border -Multi 0x8 LV0x40 -LV0x10 gMyFileList vMyFileList hwndFileLV, 编号|文件路径|存在
@@ -83,10 +83,10 @@ GuiFileShow:
 	y__:=ListVar1Y,_i_:=ListVar1Y
 	Gui, 99:Font
 	Gui, 99:Font,s12 cRed Bold
-	Gui, 99:Add, text,x+10 y+10 y%_i_% vTextInfo2,文件待发送列表
+	Gui, 99:Add, text,x+10 y%_i_% vTextInfo2,文件待发送列表（双击删除行）
 	GuiControl, 99:Font, TextInfo2
 	Gui, 99:Font
-	lx:=ListVarH+WSCROLL/2, lx2:=ListVarH*0.6
+	lx:=ListVarH+WSCROLL/2, lx2:=ListVarH*0.75
 	Gui, 99:Add, ListBox,y+10 h%lx% w%lx2% gFilePathList vFilePathList HScroll%ListVarH% Border ,% FileLisst
 	Gui, 99:show,AutoSize,「文件列表」
 	CheckedStatus:=0
@@ -161,7 +161,17 @@ RMFilePath:
 return
 
 FilePathList:
-	GuiControlGet, FilePathList ,, FilePathList, ListBox
+	If (A_GuiEvent ="DoubleClick"&&A_EventInfo) {
+		ControlGet, ListContent, List, Count,ListBox1, A
+		GuiControlGet, FilePathList ,, FilePathList, ListBox
+		if (ListContent&&FilePathList) {
+			List_Content:=ListContent~="\n"?RegExReplace(ListContent,(A_EventInfo=1?FilePathList "\n":"\n" FilePathList)):""
+			GuiControl,99:, FilePathList ,% "|" RegExReplace(List_Content,"`n","|")
+			AHKIni.RemoveKey("FileLists", A_EventInfo), AHKIni.Save()
+		}
+	}else If (A_GuiEvent ="Normal"&&A_EventInfo){
+		GuiControlGet, FilePathList ,, FilePathList, ListBox
+	}
 return
 
 AddFilePath:
