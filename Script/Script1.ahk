@@ -204,10 +204,9 @@ ClearFilePath:
 return
 
 GetFilePath:
-	Gui,99:hide
+	Gui +OwnDialogs
 	Gosub SelectedFiles
 	Gosub ReadInis
-	Gui,99:Show
 return
 
 SelectFilePath:
